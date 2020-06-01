@@ -1,90 +1,97 @@
-import sys
+import PySimpleGUI as sg
 import re
-QT = True
-if QT:
-    import PySimpleGUIQt as sg
-else:
-    import PySimpleGUI as sg
 
-def autocomplete_popup_show(text_list ):
-    autocomplete_popup_layout = [[sg.Listbox(values=text_list,
-                                             size=(100,20*len(text_list)) if QT else (15, len(text_list)),
-                                             change_submits=True,
-                                             bind_return_key=True,
-                                             auto_size_text=True,
-                                             key='_FLOATING_LISTBOX_', enable_events=True)]]
+'''
+    Demo of using a borderless window to show possible matches for autocomplete feature
+'''
 
-    autocomplete_popup = sg.Window("Borderless Window",
+
+def autocomplete_popup_show(text_list):
+    layout = [[ sg.Listbox(values=text_list,
+                            size=(15, len(text_list)),
+                            change_submits=True, bind_return_key=True,
+                            key='-FLOATING-LISTBOX-', enable_events=True) ]]
+    return sg.Window("Borderless Window",
+                                   layout,
                                    default_element_size=(12, 1),
-                                   auto_size_text=False,
-                                   auto_size_buttons=False,
-                                   no_titlebar=True,
-                                   grab_anywhere=True,
+                                   auto_size_text=False, keep_on_top=True,
+                                   no_titlebar=True, grab_anywhere=True,
                                    return_keyboard_events=True,
-                                   keep_on_top=True,
+                                   auto_size_buttons=False,
                                    background_color='black',
-                                   location=(1320,622),
-                                   default_button_element_size=(12, 1))
-
-    window = autocomplete_popup.Layout(autocomplete_popup_layout).Finalize()
-    return window
-
+                                   default_button_element_size=(12, 1),
+                                   location=(1320, 622), finalize=True)
 
 def predict_text(input, lista):
     pattern = re.compile('.*' + input + '.*')
     return [w for w in lista if re.match(pattern, w)]
 
-choices = ['ABC' + str(i) for i in range(30)]       # dummy data
 
-layout = [  [sg.Text('Your typed chars appear here:')],
-            [sg.In(key='_INPUT_', size=(10,1), do_not_clear=True)],
-            [sg.Button('Show'), sg.Button('Exit')],]
+def main():
 
-window = sg.Window('Window Title', return_keyboard_events=True).Layout(layout)
+    choices = ['ABC' + str(i) for i in range(30)]       # dummy data
 
-sel_item = -1
-skip_event = False
-while True:             # Event Loop
-    event, values = window.Read(timeout=500)
-    if event is None or event == 'Exit':
-        break
-    if event != sg.TIMEOUT_KEY:
-        # print(f'ev1 {event}')
-        in_val = values['_INPUT_']
-        prediction_list = predict_text(str(in_val), choices)
-        if prediction_list:
-            try:
-                fwindow.Close()
-            except: pass
-            fwindow = autocomplete_popup_show(prediction_list)
-            list_elem = fwindow.Element('_FLOATING_LISTBOX_')
-        if event == '_COMBO_':
-            sg.Popup('Chose', values['_COMBO_'])
-        if event.startswith('Down') or event.startswith('special 16777237'):
-            sel_item = sel_item + (sel_item<len(prediction_list))
-            list_elem.Update(set_to_index=sel_item)
-            skip_event = True
-        elif event.startswith('Up') or event.startswith('special 16777235'):
-            sel_item = sel_item - (sel_item>0)
-            list_elem.Update(set_to_index=sel_item)
-            skip_event = True
-        if event == '\r' or event.startswith('special 16777220'):
-            chosen = vals2['_FLOATING_LISTBOX_']
-            window.Element('_INPUT_').Update(vals2['_FLOATING_LISTBOX_'][0], select=True)
-            fwindow.Close()
-            sel_item = -1
-        if event.startswith('Escape') or event.startswith('special 16777216'):
-            window.Element('_INPUT_').Update('')
+    layout = [[sg.Text('Your typed chars appear here:')],
+              [sg.Input(key='-INPUT-', size=(10, 1))],
+              [sg.Button('Show'), sg.Button('Exit')], ]
 
-    try:
-        ev2, vals2 = fwindow.Read(timeout=10)
-        if ev2 == '_FLOATING_LISTBOX_' and skip_event and QT:
-            skip_event = False
-        elif ev2 != sg.TIMEOUT_KEY and ev2 is not None:
-            # print(f'ev2 {ev2}')
-            fwindow.Close()
-            window.Element('_INPUT_').Update(vals2['_FLOATING_LISTBOX_'][0], select=True)
-            sel_item = -1
-            fwindow = None
-    except: pass
-window.Close()
+    window = sg.Window('Autocomplete Demo', layout, return_keyboard_events=True)
+
+    sel_item = -1
+    fwindow = list_elem = values2 = None
+    while True:             # Event Loop
+        event, values = window.read(timeout=500)
+
+        if event in (sg.WIN_CLOSED, 'Exit'):
+            break
+
+        if event != sg.TIMEOUT_KEY:
+            # print(f'event1 {event}')
+            in_val = values['-INPUT-']
+            prediction_list = predict_text(str(in_val), choices)
+            if prediction_list:
+                try:
+                    fwindow.close()
+                except:
+                    pass
+                fwindow = autocomplete_popup_show(prediction_list)
+                list_elem = fwindow['-FLOATING-LISTBOX-']
+            if event == '_COMBO_':
+                sg.popup('Chose', values['_COMBO_'])
+
+            if event.startswith('Down') or event.startswith('special 16777237'):
+                sel_item = sel_item + (sel_item < len(prediction_list))
+                list_elem.update(set_to_index=sel_item)
+
+            elif event.startswith('Up') or event.startswith('special 16777235'):
+                sel_item = sel_item - (sel_item > 0)
+                list_elem.update(set_to_index=sel_item)
+
+            if event == '\r' or event.startswith('special 16777220'):
+                chosen = values2['-FLOATING-LISTBOX-'] if values2 is not None else None
+                if chosen:
+                    window['-INPUT-'].update(chosen[0], select=True)
+                fwindow.close()
+                sel_item = -1
+
+            if event.startswith('Escape') or event.startswith('special 16777216'):
+                window['-INPUT-'].update('')
+
+        try:
+            event2, values2 = fwindow.read(timeout=10)
+            # if event2 == '-FLOATING-LISTBOX-' and skip_event and QT:
+            #     skip_event = False
+            if event2 != sg.TIMEOUT_KEY and event2 is not None:
+                # print(f'event2 {event2}')
+                fwindow.close()
+                window['-INPUT-'].update(values2['-FLOATING-LISTBOX-']
+                                         [0], select=True)
+                sel_item = -1
+                fwindow = None
+        except:
+            pass
+
+    window.close()
+
+if __name__ == '__main__':
+    main()

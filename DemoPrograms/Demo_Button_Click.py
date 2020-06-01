@@ -1,33 +1,31 @@
-#!/usr/bin/env python
-import sys
-if sys.version_info[0] >= 3:
-    import PySimpleGUI as sg
-else:
-    import PySimpleGUI27 as sg
+import PySimpleGUI as sg
+from random import randint
 
-if not sys.platform.startswith('win'):
-    sg.PopupError('Sorry, you gotta be on Windows')
-    sys.exit()
-import winsound
+sg.theme('Dark Blue 3')
 
+layout = [  [sg.Text('Temperature'), sg.T(' '*30), sg.Text(size=(8,1), key='-TEMP OUT-')],
+            [sg.Text('Set Temp'), sg.T(' '*8), sg.Input(size=(8,1), key='-IN-'), sg.T(' '*10), sg.Button('Set')],
+            [sg.Button('Off'), sg.T(' '*13), sg.Button('Turn relay on', button_color=('white', 'red')),sg.T(' '*5), sg.Button('Quit')]  ]
 
-sg.ChangeLookAndFeel('Dark')
-sg.SetOptions(element_padding=(0,0))
+window = sg.Window('Temperature Manager', layout, font='Default -24', return_keyboard_events=True, no_titlebar=True)
 
-layout = [
-          [sg.ReadButton('Start', button_color=('white', 'black'), key='start'),
-           sg.ReadButton('Stop', button_color=('white', 'black'), key='stop'),
-           sg.ReadButton('Reset', button_color=('white', 'firebrick3'), key='reset'),
-           sg.ReadButton('Submit', button_color=('white', 'springgreen4'), key='submit')]
-          ]
+while True:             # Event Loop
+    event, values = window.read(timeout=500)    # returns every 500 ms
+    print(event, values) if event != sg.TIMEOUT_KEY else None       # a debug print
+    if event in (sg.WIN_CLOSED, 'Quit'):
+        break
+    if event == 'Set':
+        print('setting temperature to ', values['-IN-'])
+        window['-TEMP OUT-'].update(values['-IN-'] + ' C')
+    elif event.startswith('Turn'):
+        print('Turning on the relay')
+    elif event == 'Off':
+        print('Turning off sensor')
+    elif event.startswith('F11'):
+        window.maximize()
+    elif event.startswith('Escape'):
+        window.normal()
 
-window = sg.Window("Button Click", default_element_size=(12,1), text_justification='r', auto_size_text=False, auto_size_buttons=False, default_button_element_size=(12,1), use_default_focus=False).Layout(layout).Finalize()
+    window['-TEMP OUT-'].update(str(randint(2,70)) + ' C')
 
-window.FindElement('submit').Update(disabled=True)
-
-recording = have_data = False
-while True:
-    event, values = window.Read()
-    if event is None:
-        sys.exit(69)
-    winsound.PlaySound("ButtonClick.wav", 1)
+window.close()

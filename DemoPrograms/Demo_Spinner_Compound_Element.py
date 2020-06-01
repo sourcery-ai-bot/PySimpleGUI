@@ -1,37 +1,31 @@
 #!/usr/bin/env python
-import sys
-if sys.version_info[0] >= 3:
-    import PySimpleGUI as sg
-else:
-    import PySimpleGUI27 as sg
+import PySimpleGUI as sg
+
 """
     Demo of how to combine elements into your own custom element
 """
 
-sg.SetOptions(element_padding=(0,0))
-# sg.ChangeLookAndFeel('Dark')
-# --- Define our "Big-Button-Spinner" compound element. Has 2 buttons and an input field --- #
-NewSpinner =  [sg.Button('-', size=(2,1), font='Any 12'),
-               sg.In('0', size=(2,1), font='Any 14', justification='r', key='spin'),
-               sg.Button('+', size=(2,1), font='Any 12')]
+sg.set_options(element_padding=(0, 0))
+# --- Define the Compound Element. Has 2 buttons and an input field --- #
+NewSpinner = [sg.Input('0', size=(3, 1), font='Any 12', justification='r', key='-SPIN-'),
+             sg.Column([[sg.Button('▲', size=(1, 1), font='Any 7', border_width=0, button_color=(sg.theme_text_color(), sg.theme_background_color()), key='-UP-')],
+            [sg.Button('▼', size=(1, 1), font='Any 7', border_width=0, button_color=(sg.theme_text_color(), sg.theme_background_color()), key='-DOWN-')]])]
 # --- Define Window --- #
-layout = [
-          [sg.Text('Spinner simulation')],
+layout = [[sg.Text('Spinner simulation')],
             NewSpinner,
-            [sg.T('')],
-          [sg.Ok()]
-         ]
+            [sg.Text('')],
+            [sg.Ok()]]
 
-window = sg.Window('Spinner simulation').Layout(layout)
+window = sg.Window('Spinner simulation', layout, use_default_focus=False)
 
 # --- Event Loop --- #
-counter = 0
 while True:
-    event, values = window.Read()
+    event, values = window.read()
 
-    if event == 'Ok' or event is None:    # be nice to your user, always have an exit from your form
+    if event == 'Ok' or event == sg.WIN_CLOSED:    # be nice to your user, always have an exit from your form
         break
-
+    counter = int(values['-SPIN-'])
     # --- do spinner stuff --- #
-    counter += 1 if event == '+' else -1 if event == '-' else 0
-    window.FindElement('spin').Update(counter)
+    counter += 1 if event == '-UP-' else -1 if event == '-DOWN-' else 0
+    window['-SPIN-'].update(counter)
+window.close()

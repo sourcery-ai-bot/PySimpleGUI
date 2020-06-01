@@ -8,9 +8,8 @@
          
  ![Python Version](https://img.shields.io/badge/Python-3.x-yellow.svg)        
         
-![Python Version](https://img.shields.io/badge/PySimpleGUIWeb_-0..0-orange.svg?longCache=true&style=for-the-badge)        
-        
-                
+
+[![PyPI Version](https://img.shields.io/pypi/v/pysimpleguiweb.svg?style=for-the-badge)](https://pypi.org/project/pysimpleguiweb/)                
         
 # PySimpleGUIWeb     
 
@@ -369,7 +368,7 @@ One-time patch to remove a debug print
 	* click events works
 	
 
-## 0.28.0 PySimpleGUIWeb 15-May-2019
+## 0.28.1 PySimpleGUIWeb 15-May-2019
 
 * Menus
 	* Yes, the full Menu Bar across the top of the window!
@@ -391,10 +390,91 @@ One-time patch to remove a debug print
 	* Behaves like a Column element for now since no official Remi Frame
 * Fix for popups that get data - New dictionary return values messed up popups. Needed to use keys internally
 
-	
-  
+## 0.31.0 PySimpleGUIWeb 04-Nov-2019
 
-# Design        
+* PEP8 bindings!
+* Window - NEW way of finding elements
+	* Use window[key] instead of window.FindElement(key)!!
+* Winow - "calling" an existing window object will call its read method
+* Version number added both dunder version and version work
+* Renamed some variables to be private by adding _ to the front
+* METADATA added to all elements and Window
+* Ability to "call" an element.  The effect is to call that element's update method
+* Removed all delete functions in the classes.  Were poorly done and not consistent
+* Output element - fix for color defaults, CurrentValue contains all of the text currently shown
+* Image Element
+	* Rewrite done by Remi team!!! 
+	* Fixes flicker when using with OpenCV
+* Removed quite a bit of unused code
+* Added prints where items are not yet implemented
+* Window - finalize parameter added
+* Get screen dimensions always returns (0,0) for now until can figure it out
+* Made return values computation easier
+* Two new look and feel color settings - Material1, Material2
+
+## 0.32.0 PySimpleGUIWeb 08-Nov-2019
+
+* Fix for Output Element scrolling. Now cursor stays at end
+* Fix for Multiline Output scrolling. Appends correctly and autoscrolls if enabled
+
+## 0.33.0 PySimpleGUIWeb 17-Nov-2019
+
+* Added autoscroll parameter to the MultilineOutput.update method
+* TONS of new Look and Feel Themes
+* Fuzzy name matcher for change_loo_and_feel call - string doesn't have to perfectly match now
+* New preview_all_look_and_feel_themes function displays all of the colors for the Themes
+
+## 0.34.0 PySimpleGUIWeb 24-Dec-2019
+
+Themes +
+
+* New theme apis that replace the change_look_and_feel call (see primary PySimpleGUI port for more info)
+* New default theme is Dark Blue 3
+* Added ported string so can tell this is the "PySimpleGUIWeb" port
+* Removed platform specific code that was barring Macs from using colors, even for the web
+* Changed "TRANSPARENT_BUTTON" string to invalidate it. It was misunderstood and should not bave been inlucded in anything
+* Ability to change the files delimeter for browse files to filenames can have ; in them
+
+
+## 0.35.0  PySimpleGUIWeb  16-Jan-2020
+
+* Fixed Slider crash caused by latest Remi releaese
+* Brought over latest Theme code from PySimpleGUI-tk (text background color, changed all black and white refs to hex)
+* New Graph.change_coordinates method
+* Removed check for no image specified in Image.update (so cal specify visibilty without changing image for example)
+
+## 0.36.0 PySimpleGUIWeb 20-Feb-2020
+
+* Allow empty value to be specified when creating Image element
+* Fix for Text element crashing following the Remi 2020.2.5 release
+	* Crash will show trying to use method "set_layout_orientation"
+	
+## 0.37.0 PySimpleGUIWeb 14-Apr-2020
+
+Catching up to latest Remi releases.
+
+* NO LONGER ADDING \n TO MULTILINE, MULTILINE_OUTPUT UPDATES
+	* This may cause some of your problems. Sorry about this, but it's the right thing to do so that prints work correctly
+* Multiline.print capability
+* MultilineOutput.print capability
+* Fix for MultilineOutput not autoscrolling
+* Fix for image update flicker
+* Printing sep char fixed
+* Fix for extra Tab
+* Replaced SvgGroup with SvgSubcontainer (Requires Remi 2020.3.10)
+* BIG Thank You owed to Remi creator Davide (for this and many other releases too)
+
+
+## 0.38.0 PySimpleGUIWeb 6-May-2020
+
+* Added constants
+  * WIN_CLOSED and WINDOW_CLOSED
+  * EVENT_TIMEOUT and TIMEOUT_EVENT
+
+
+
+# Design 
+
 # Author 
  Mike B.        
         
@@ -403,8 +483,4 @@ One-time patch to remove a debug print
  GNU Lesser General Public License (LGPL 3) +        
         
 # Acknowledgments
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbMjA1OTc2NTUwMywtMTE2NjcxOTkxNyw0Nz
-U4NjU2NzYsLTEwNTcxMDM2NDMsMTIxMzM1MjYzNiwtMTE2MDY4
-NDMzOV19
--->
+This could not be possible without the Remi project!  Thank you Remi!!!!

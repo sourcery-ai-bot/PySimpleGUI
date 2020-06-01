@@ -1,11 +1,6 @@
 #!/usr/bin/env python
+import PySimpleGUI as sg
 import sys
-if sys.version_info[0] >= 3:
-    import PySimpleGUI as sg
-else:
-    import PySimpleGUI27 as sg
-
-
 '''
 Quickly add a GUI to your script!
 
@@ -18,13 +13,19 @@ The 1-line-GUI shows a form that allows the user to browse to find the filename.
 stores the result in the variable fname, just like the command line parsing did.
 '''
 
+fname = ''
 if len(sys.argv) == 1:
-    event, (fname,) = sg.Window('My Script').Layout([[sg.T('Document to open')],
-                                                            [sg.In(), sg.FileBrowse()],
-                                                            [sg.CloseButton('Open'), sg.CloseButton('Cancel')]]).Read()
+    layout = [
+        [sg.Text('Document to open')],
+        [sg.Input(), sg.FileBrowse()],
+        [sg.CloseButton('Open'), sg.CloseButton('Cancel')]
+    ]
+    window = sg.Window('My Script', layout)
+    event, values = window.read()
+    window.close()
+    fname = values['-FNAME-']
 else:
     fname = sys.argv[1]
-
 if not fname:
-    sg.Popup("Cancel", "No filename supplied")
+    sg.popup("Cancel", "No filename supplied")
     raise SystemExit("Cancelling: no filename supplied")

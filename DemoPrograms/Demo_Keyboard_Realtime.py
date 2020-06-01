@@ -1,17 +1,14 @@
 #!/usr/bin/env python
-import sys
-if sys.version_info[0] >= 3:
-    import PySimpleGUI as sg
-else:
-    import PySimpleGUI27 as sg
+import PySimpleGUI as sg
 
 layout = [[sg.Text("Hold down a key")],
           [sg.Button("OK")]]
 
-window = sg.Window("Realtime Keyboard Test", return_keyboard_events=True, use_default_focus=False).Layout(layout)
+window = sg.Window("Realtime Keyboard Test", layout, return_keyboard_events=True,
+                   use_default_focus=False)
 
 while True:
-    event, values = window.Read(timeout=0)
+    event, values = window.read(timeout=0)
 
     if event == "OK":
         print(event, values, "exiting")
@@ -21,5 +18,7 @@ while True:
             print('%s - %s' % (event, ord(event)))
         else:
             print(event)
-    elif event is None:
+    elif event == sg.WIN_CLOSED:
         break
+
+window.close()

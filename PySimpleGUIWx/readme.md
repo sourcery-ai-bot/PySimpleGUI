@@ -7,8 +7,8 @@
          
  ![Python Version](https://img.shields.io/badge/Python-3.x-yellow.svg)        
         
-![Python Version](https://img.shields.io/badge/PySimpleGUIWx_For_Python_3.x_Version-0..0-orange.svg?longCache=true&style=for-the-badge)        
-        
+      
+[![PyPI Version](https://img.shields.io/pypi/v/pysimpleguiwx.svg?style=for-the-badge)](https://pypi.org/project/pysimpleguiwx/)         
                 
         
 # PySimpleGUIWx        
@@ -41,7 +41,7 @@ This simple list is another way of looking at the question....
 4.  It's fun to program GUIs again
 
 
- ## Engineering Pre-Release   Version 0.7.0
+ ## Engineering Pre-Release   Version 0.13.0
  
  [Announcements of Latest Developments](https://github.com/MikeTheWatchGuy/PySimpleGUI/issues/142)        
 
@@ -63,14 +63,17 @@ Remember, these are Engineering Releases.  Not all features are complete, but ge
 * Output multiline
 * Output
 * Columns
+* Frames - except cannot set colors yet
 * Progress Meters
 * Checkbox
 * Radio Button
 * Combobox
 * Spinner
+* Vertical and Horizontal Separators
 
 
 #### Features
+
 * System Tray
 * Debug Print
 * Invisible/Visible Elements
@@ -102,8 +105,7 @@ Remember, these are Engineering Releases.  Not all features are complete, but ge
 * Look and Feel settings
 * Default Icon
 * Base64 Icons
-
-
+* PEP8 bindings for all element methods and functions
 
 
 It won't take long to poke at these and hit errors.  For example, the code to do Button Updates is not complete.  Most of the time you won't be doing this. 
@@ -364,6 +366,66 @@ Starting with release 0.4.0, most of the Popup functions work.  This means you c
 
 * NEW Window parameter layout so can skip calling Layout
 
+## 0.13.0 1-OCT-2019 PySimpleGUIWx
+
+* Version numbering using sg.version string
+* PEP8 bindings!
+* Improved scaling of character to pixel sizes of elements that are multilined
+* Added Metadata variable to all elements
+* Renamed element callback functions to start with _
+* Removed __del__ methods everywhere except Output Element
+* Can "Call" an element which will call its Update method
+* InputText element - convert default text and password char to string 
+* Removed old code such as tkinter's tooltip and drag and drop from Qt
+* Shortcut I for InputText
+* Listbox added size_px parm
+* Changed type checking to use the comment style types
+* Added Element.Widget to all Elements so can access the Wx widgets directly
+* Text Element now defaults to '' so no need to specify anything if a blank Text Element (often used for output)
+* Button text converted to string when creating button
+* New Button shortcuts - B, Btn
+* VerticalSeparator - Newly supported Element
+* HorizontalSeparator - Newly supported Element
+* Slider - added size_px parm
+* Fixed leak caused by System Tray not cleaning up the timer
+* Window - added finalize paramter so can skip using chained .Finalize()
+* Window - AllKeysDict now used like other PySimpleGUI ports. Has all the keys and elements in a window
+* Window.FindElement - added silent_on_error parm like other ports have
+* Window[key] construct added that calls FindElement
+* window() - can "Call" a window you've created. Will call Window.Read()
+* Popup buttons no longer use CloseButtons for normal popups.  Calls window.Close manually
+* PopupGetFolder changed to use keys, normal button, new window design patterns
+* PopupGetFile changed to use keys, normal buttons, new window design patterns
+* PopupGetText changed to use keys, normal buttons, new window design patterns
+* Default application (PySimpleGUI.main) now shows the version number like other PySimpleGUI ports
+
+## 0.13.0 17-Nov-2019 PySimpleGUIWx
+
+* 105 Look and Feel Themes to choose from!
+* New "Fuzzy" look and feel selection
+* Preview all look and feels not yet supported due to lack of Frame support
+
+## 0.15.0 PySimpleGUIWx 24-Dec-2019
+
+Themes!
+
+* Picked up the new "theme" APIs like all 4 ports got
+* Dark Blue 3 is the new official color theme for PySimpleGUI
+* Added "port" string so that your code can detect which port of PySimpleGUI is being executed
+* Removed restriction on Macs (totally didn't make sense that it was there as it blocked a tkinter problem, not a Wx one)
+* Depricated the TRANSPARENT_BUTTON variable as it was being misunderstood by users and was misleading
+* BROWSE_FILES_DELIMITER can be changed to change the default ';' delimeter between filenames in FilesBrowse button
+* Frame Element!  BUT, it's only a partial solution as I am unable to set the background color (need to understand how panels work). It's better than nothing
+
+
+## 0.16.0 PySimpleGUIWx 6-May-2020
+
+* Added constants
+    * WIN_CLOSED and WINDOW_CLOSED
+    * EVENT_TIMEOUT and TIMEOUT_EVENT
+* Added Graph.change_coordinates method
+* Added close parameter to Window.read
+
 
 
 # Design        
@@ -376,6 +438,5 @@ Starting with release 0.4.0, most of the Popup functions work.  This means you c
         
 # Acknowledgments
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyMzExNjg0MDAsLTIxNDIwNTI0ODQsOD
-g2MzA1Mjk2XX0=
+eyJoaXN0b3J5IjpbLTIxNDIwNTI0ODQsODg2MzA1Mjk2XX0=
 -->
