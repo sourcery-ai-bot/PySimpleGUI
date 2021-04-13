@@ -32,7 +32,7 @@ def long_operation_thread(seconds):
     global message, progress
 
     print('Thread started - will sleep for {} seconds'.format(seconds))
-    for i in range(int(seconds * 10)):
+    for _ in range(int(seconds * 10)):
         time.sleep(.1)  # sleep for a while
         progress += total / (seconds * 10)
 

@@ -131,7 +131,7 @@ def custom_meter_example():
     for i in range(10000):
         # check to see if the cancel button was clicked and exit loop if clicked
         event, values = window.Read(timeout=0)
-        if event == 'Cancel' or event == None:
+        if event == 'Cancel' or event is None:
             break
         # update bar with loop value +1 so that bar eventually reaches the maximum
         progress_bar.UpdateBar(i+1, 10000)

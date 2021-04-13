@@ -63,4 +63,10 @@ while True:  # Event Loop
     # if clicked button to dump the table's values
     if event.startswith('Show Table'):
         table = [[values[(row, col)] for col in range(MAX_COLS)] for row in range(MAX_ROWS)]
-        sg.popup_scrolled('your_table = [ ', ',\n'.join([str(table[i]) for i in range(MAX_ROWS)]) + '  ]', title='Copy your data from here', font='fixedsys', keep_on_top=True)
+        sg.popup_scrolled(
+            'your_table = [ ',
+            ',\n'.join(str(table[i]) for i in range(MAX_ROWS)) + '  ]',
+            title='Copy your data from here',
+            font='fixedsys',
+            keep_on_top=True,
+        )

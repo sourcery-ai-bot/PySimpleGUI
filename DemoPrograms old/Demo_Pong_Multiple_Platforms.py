@@ -58,16 +58,12 @@ class Ball:
     def hit_bat(self, pos):
         bat_pos = (self.bat_1.curx, self.bat_1.cury)
         if pos[0] >= bat_pos[0] and pos[0] <= bat_pos[0]+BAT_SIZE[0]:
-            if bat_pos[1] <= pos[1] <= bat_pos[1]+BAT_SIZE[1]:
-                return True
-            return False
+            return bat_pos[1] <= pos[1] <= bat_pos[1]+BAT_SIZE[1]
 
     def hit_bat2(self, pos):
         bat_pos = (self.bat_2.curx, self.bat_2.cury)
         if pos[0] >= bat_pos[0] and pos[0] <= bat_pos[0]+BAT_SIZE[0]:
-            if bat_pos[1] <= pos[1] <= bat_pos[1]+BAT_SIZE[1]:
-                return True
-            return False
+            return bat_pos[1] <= pos[1] <= bat_pos[1]+BAT_SIZE[1]
 
 
     def draw(self):
@@ -115,8 +111,7 @@ class PongBat():
 
     @property
     def curr_pos(self):
-        pos = self.cury
-        return pos
+        return self.cury
 
     def draw(self):
         self.graph.RelocateFigure(self.id, self.curx, self.cury)

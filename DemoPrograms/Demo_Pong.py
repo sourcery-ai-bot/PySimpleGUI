@@ -48,16 +48,12 @@ class Ball:
     def hit_bat(self, pos):
         bat_pos = self.canvas.coords(self.bat.id)
         if pos[2] >= bat_pos[0] and pos[0] <= bat_pos[2]:
-            if pos[3] >= bat_pos[1] and pos[3] <= bat_pos[3]:
-                return True
-            return False
+            return pos[3] >= bat_pos[1] and pos[3] <= bat_pos[3]
 
     def hit_bat2(self, pos):
         bat_pos = self.canvas.coords(self.bat2.id)
         if pos[2] >= bat_pos[0] and pos[0] <= bat_pos[2]:
-            if pos[3] >= bat_pos[1] and pos[3] <= bat_pos[3]:
-                return True
-            return False
+            return pos[3] >= bat_pos[1] and pos[3] <= bat_pos[3]
 
     def draw(self):
         self.canvas.move(self.id, self.x, self.y)
@@ -156,7 +152,7 @@ def pong():
         # ------------- Read the form, get keypresses -------------
         event, values = window.read(timeout=0)
         # ------------- If quit  -------------
-        if event == sg.WIN_CLOSED or event == 'Quit':
+        if event in [sg.WIN_CLOSED, 'Quit']:
             break
         # ------------- Keypresses -------------
         if event is not None:

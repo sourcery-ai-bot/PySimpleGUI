@@ -44,10 +44,7 @@ def Launcher2():
     sg.theme('GreenTan')
 
     filelist = glob.glob(LOCATION_OF_YOUR_SCRIPTS+'*.py')
-    namesonly = []
-    for file in filelist:
-        namesonly.append(ntpath.basename(file))
-
+    namesonly = [ntpath.basename(file) for file in filelist]
     layout = [
         [sg.Listbox(values=namesonly, size=(30, 19),
                     select_mode=sg.SELECT_MODE_EXTENDED, key='demolist'),

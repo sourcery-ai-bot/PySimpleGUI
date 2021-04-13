@@ -356,9 +356,8 @@ class Element():
     def _FindReturnKeyBoundButton(self, form):
         for row in form.Rows:
             for element in row:
-                if element.Type == ELEM_TYPE_BUTTON:
-                    if element.BindReturnKey:
-                        return element
+                if element.Type == ELEM_TYPE_BUTTON and element.BindReturnKey:
+                    return element
                 if element.Type == ELEM_TYPE_COLUMN:
                     rc = self._FindReturnKeyBoundButton(element)
                     if rc is not None:
@@ -549,7 +548,7 @@ class Combo(Element):
         # self.InitializeAsDisabled = disabled
         self.Disabled = disabled
         self.Readonly = readonly
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
         self.VisibleItems = visible_items
         self.AutoComplete = auto_complete
@@ -566,7 +565,7 @@ class Combo(Element):
     def Update(self, value=None, values=None, set_to_index=None, disabled=None, readonly=None,  background_color=None, text_color=None, font=None, visible=None):
         if values is not None:
             self.Values = values
-            for i in range(self.QT_ComboBox.count()):
+            for _ in range(self.QT_ComboBox.count()):
                 self.QT_ComboBox.removeItem(0)
             self.QT_ComboBox.addItems(values)
         if value is not None:
@@ -617,7 +616,7 @@ class OptionMenu(Element):
         self.DefaultValue = default_value
         self.TKOptionMenu = None
         self.Disabled = disabled
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
 
         super().__init__(ELEM_TYPE_INPUT_OPTION_MENU, size=size, auto_size_text=auto_size_text, background_color=bg,
@@ -673,7 +672,7 @@ class Listbox(Element):
             self.SelectMode = SELECT_MODE_CONTIGUOUS
         else:
             self.SelectMode = DEFAULT_LISTBOX_SELECT_MODE
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
         self.Widget = self.QT_ListWidget = None                 # type: QListWidget
         tsize = size                # convert tkinter size to pixels
@@ -691,7 +690,7 @@ class Listbox(Element):
     def Update(self, values=None, disabled=None, set_to_index=None,background_color=None, text_color=None, font=None, visible=None):
         if values is not None:
             self.Values = values
-            for i in range(self.QT_ListWidget.count()):
+            for _ in range(self.QT_ListWidget.count()):
                 self.QT_ListWidget.takeItem(0)
             items = [str(v) for v in self.Values]
             self.QT_ListWidget.addItems(items)
@@ -725,12 +724,8 @@ class Listbox(Element):
 
         :return: (List[Any]) The currently selected items in the listbox
         """
-        value = []
         selected_items = [item.text() for item in self.QT_ListWidget.selectedItems()]
-        for v in self.Values:
-            if str(v) in selected_items:
-                value.append(v)
-        return value
+        return [v for v in self.Values if str(v) in selected_items]
 
     get_list_values = GetListValues
     set_value = SetValue
@@ -827,7 +822,7 @@ class Checkbox(Element):
         self.Value = None
         self.TKCheckbutton = None
         self.Disabled = disabled
-        self.TextColor = text_color if text_color else DEFAULT_TEXT_COLOR
+        self.TextColor = text_color or DEFAULT_TEXT_COLOR
         self.ChangeSubmits = change_submits or enable_events
         self.Widget = self.QT_Checkbox = None           # type: QCheckBox
 
@@ -889,7 +884,7 @@ class Spin(Element):
         self.DefaultValue = initial_value
         self.ChangeSubmits = change_submits or enable_events
         self.Disabled = disabled
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
         self.Widget = self.QT_Spinner = None            # type: StringBox
 
@@ -973,7 +968,7 @@ class Multiline(Element):
         '''
         self.DefaultText = default_text
         self.EnterSubmits = enter_submits
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         self.Focus = focus
         self.do_not_clear = do_not_clear
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
@@ -1043,7 +1038,7 @@ class Multiline(Element):
         if value is not None and not append:
             self.DefaultText = value
             self.QT_TextEdit.setText(str(value))
-        elif value is not None and append:
+        elif value is not None:
             self.DefaultText = value
             # self.QT_TextEdit.setText(self.QT_TextEdit.toPlainText() + str(value)) # original code
             # self.QT_TextEdit.append(str(value))   # can't use because adds a newline
@@ -1124,7 +1119,7 @@ class MultilineOutput(Element):
         '''
         self.DefaultText = default_text
         self.EnterSubmits = enter_submits
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         self.Focus = focus
         self.do_not_clear = do_not_clear
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
@@ -1198,7 +1193,7 @@ class Text(Element):
         :param tooltip:
         '''
         self.DisplayText = str(text)
-        self.TextColor = text_color if text_color else DEFAULT_TEXT_COLOR
+        self.TextColor = text_color or DEFAULT_TEXT_COLOR
         self.Justification = justification or 'left'
         self.Relief = relief
         self.ClickSubmits = click_submits or enable_events
@@ -1209,8 +1204,21 @@ class Text(Element):
             bg = background_color
         self.Widget = self.QT_Label = None              # type: QLabel
 
-        super().__init__(ELEM_TYPE_TEXT, size, auto_size_text, background_color=bg, font=font if font else DEFAULT_FONT,
-                         text_color=self.TextColor, visible=visible, pad=pad, key=key, tooltip=tooltip, size_px=size_px, metadata=metadata)
+        super().__init__(
+            ELEM_TYPE_TEXT,
+            size,
+            auto_size_text,
+            background_color=bg,
+            font=font or DEFAULT_FONT,
+            text_color=self.TextColor,
+            visible=visible,
+            pad=pad,
+            key=key,
+            tooltip=tooltip,
+            size_px=size_px,
+            metadata=metadata,
+        )
+
         return
 
     def _QtCallbackTextClicked(self, event):
@@ -1258,7 +1266,7 @@ class Output(Element):
         :param key:
         '''
         self._TKOut = None
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
         self.Widget = self.QT_TextBrowser = None            # type: QTextBrowser
         tsize = size_px if size_px != (None,None) else _convert_tkinter_size_to_Qt(size, scaling=DEFAULT_PIXELS_TO_CHARS_SCALING_MULTILINE_TEXT,height_cutoff=DEFAULT_PIXEL_TO_CHARS_CUTOFF_MULTILINE) if size[0] is not None else size
@@ -1338,7 +1346,7 @@ class Button(Element):
         self.TKButton = None
         self.Target = target
         self.ButtonText = str(button_text)
-        self.ButtonColor = button_color if button_color else DEFAULT_BUTTON_COLOR
+        self.ButtonColor = button_color or DEFAULT_BUTTON_COLOR
         self.TextColor = self.ButtonColor[0]
         self.BackgroundColor = self.ButtonColor[1]
         self.ImageFilename = image_filename
@@ -1580,7 +1588,7 @@ class ButtonMenu(Element):
         self.MenuDefinition = menu_def
         self.AutoSizeButton = auto_size_button
         self.ButtonText = button_text
-        self.ButtonColor = button_color if button_color else DEFAULT_BUTTON_COLOR
+        self.ButtonColor = button_color or DEFAULT_BUTTON_COLOR
         self.TextColor = self.ButtonColor[0]
         self.BackgroundColor = self.ButtonColor[1]
         self.BorderWidth = border_width
@@ -1650,11 +1658,11 @@ class ProgressBar(Element):
         self.TKProgressBar = None
         self.Cancelled = False
         self.NotRunning = True
-        self.Orientation = orientation if orientation else DEFAULT_METER_ORIENTATION
+        self.Orientation = orientation or DEFAULT_METER_ORIENTATION
         self.BarColor = bar_color if bar_color != (None, None) else DEFAULT_PROGRESS_BAR_COLOR
-        self.BarStyle = style if style else DEFAULT_PROGRESS_BAR_STYLE
+        self.BarStyle = style or DEFAULT_PROGRESS_BAR_STYLE
         self.BorderWidth = border_width if border_width is not None else DEFAULT_PROGRESS_BAR_BORDER_WIDTH
-        self.Relief = relief if relief else DEFAULT_PROGRESS_BAR_RELIEF
+        self.Relief = relief or DEFAULT_PROGRESS_BAR_RELIEF
         self.BarExpired = False
         self.StartValue = start_value
         tsize = size
@@ -1816,9 +1824,14 @@ class Graph(Element):
 
         qcolor = QColor(color)
         pen = QPen(qcolor, width)
-        line = self.QT_QGraphicsScene.addLine(self.x+converted_point_from[0],self.y+ converted_point_from[1], self.x+converted_point_to[0],self.y+ converted_point_to[1], pen=pen)
         # self.QT_QGraphicsItemGroup.addToGroup(line)
-        return line
+        return self.QT_QGraphicsScene.addLine(
+            self.x + converted_point_from[0],
+            self.y + converted_point_from[1],
+            self.x + converted_point_to[0],
+            self.y + converted_point_to[1],
+            pen=pen,
+        )
 
     def DrawRectangle(self, top_left, bottom_right, fill_color=None, line_color=None):
         converted_point_top_left = self._convert_xy_to_canvas_xy(top_left[0], top_left[1])
@@ -2059,8 +2072,7 @@ class Frame(Element):
     def _GetElementAtLocation(self, location):
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
     def Update(self, visible=None):
         super().Update(self.QT_QGroupBox, visible=visible)
@@ -2187,8 +2199,7 @@ class Tab(Element):
     def _GetElementAtLocation(self, location):
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
 
     def Select(self):
@@ -2275,8 +2286,7 @@ class TabGroup(Element):
     def _GetElementAtLocation(self, location):
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
     def FindKeyFromTabName(self, tab_name):
         for row in self.Rows:
@@ -2346,9 +2356,9 @@ class Slider(Element):
         self.TKScale = None
         self.Range = (1, 10) if range == (None, None) else range
         self.DefaultValue = self.Range[0] if default_value is None else default_value
-        self.Orientation = orientation if orientation else DEFAULT_SLIDER_ORIENTATION
-        self.BorderWidth = border_width if border_width else DEFAULT_SLIDER_BORDER_WIDTH
-        self.Relief = relief if relief else DEFAULT_SLIDER_RELIEF
+        self.Orientation = orientation or DEFAULT_SLIDER_ORIENTATION
+        self.BorderWidth = border_width or DEFAULT_SLIDER_BORDER_WIDTH
+        self.Relief = relief or DEFAULT_SLIDER_RELIEF
         self.Resolution = 1 if resolution is None else resolution
         self.ChangeSubmits = change_submits or enable_events
         self.Disabled = disabled
@@ -2417,9 +2427,9 @@ class Dial(Element):
         self.TKScale = None
         self.Range = (1, 10) if range == (None, None) else range
         self.DefaultValue = self.Range[0] if default_value is None else default_value
-        self.Orientation = orientation if orientation else DEFAULT_SLIDER_ORIENTATION
-        self.BorderWidth = border_width if border_width else DEFAULT_SLIDER_BORDER_WIDTH
-        self.Relief = relief if relief else DEFAULT_SLIDER_RELIEF
+        self.Orientation = orientation or DEFAULT_SLIDER_ORIENTATION
+        self.BorderWidth = border_width or DEFAULT_SLIDER_BORDER_WIDTH
+        self.Relief = relief or DEFAULT_SLIDER_RELIEF
         self.Resolution = 1 if resolution is None else resolution
         self.ChangeSubmits = change_submits or enable_events
         self.Disabled = disabled
@@ -2435,13 +2445,8 @@ class Dial(Element):
 
 
     def Update(self, value=None, range=(None, None), disabled=None, visible=None):
-        if value is not None:           # TODO clearly not done!
-            pass
+        if value is not None:       # TODO clearly not done!
             self.DefaultValue = value
-        if disabled == True:
-            pass
-        elif disabled == False:
-            pass
         super().Update(self.QT_Dial, visible=visible)
 
 
@@ -2533,8 +2538,7 @@ class Column(Element):
     def _GetElementAtLocation(self, location):
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
 
     def Update(self, visible=None):
@@ -3224,10 +3228,10 @@ class Window:
         self.DefaultButtonElementSize = _convert_tkinter_size_to_Qt(default_button_element_size) if default_button_element_size != (
             None, None) else DEFAULT_BUTTON_ELEMENT_SIZE
         self.Location = location
-        self.ButtonColor = button_color if button_color else DEFAULT_BUTTON_COLOR
-        self.BackgroundColor = background_color if background_color else DEFAULT_BACKGROUND_COLOR
+        self.ButtonColor = button_color or DEFAULT_BUTTON_COLOR
+        self.BackgroundColor = background_color or DEFAULT_BACKGROUND_COLOR
         self.ParentWindow = None
-        self.Font = font if font else DEFAULT_FONT
+        self.Font = font or DEFAULT_FONT
         self.RadioDict = {}
         self.BorderDepth = border_depth
         self.WindowIcon = icon if icon is not None else Window.user_defined_icon
@@ -3405,8 +3409,7 @@ class Window:
     def _GetElementAtLocation(self, location):
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
     def _GetDefaultElementSize(self):
         return self.DefaultElementSize
@@ -3478,9 +3481,7 @@ class Window:
         self.Timeout = timeout
         self.TimeoutKey = timeout_key
         self.NonBlocking = False
-        if not self.Shown:
-            self.Show()
-        else:
+        if self.Shown:
             # if already have a button waiting, the return previously built results
             if self.LastButtonClicked is not None and not self.LastButtonClickedWasRealtime:
                 # print(f'*** Found previous clicked saved {self.LastButtonClicked}')
@@ -3498,20 +3499,17 @@ class Window:
                     self.TKrootDestroyed = True
                     Window.DecrementOpenCount()
                 results = BuildResults(self, False, self)
-                if results[0] != None and results[0] != timeout_key:
+                if results[0] not in [None, timeout_key]:
                     return results
-                else:
-                    pass
-
-                # else:
-                #     print("** REALTIME PROBLEM FOUND **", results)
+                        # else:
+                        #     print("** REALTIME PROBLEM FOUND **", results)
 
             # normal read blocking code....
-            if timeout != None:
+            if timeout is None:
+                timer = None
+            else:
                 self.TimerCancelled = False
                 timer = start_window_read_timer(self, timeout)
-            else:
-                timer = None
             self.CurrentlyRunningMainloop = True
             # print(f'In main {self.Title}')
             ################################# CALL GUI MAINLOOP ############################
@@ -3529,19 +3527,27 @@ class Window:
             # if form was closed with X
             if self.LastButtonClicked is None and self.LastKeyboardEvent is None and self.ReturnValues[0] is None:
                 Window.DecrementOpenCount()
+        else:
+            self.Show()
         # Determine return values
-        if self.LastKeyboardEvent is not None or self.LastButtonClicked is not None:
+        if self.LastKeyboardEvent is None and self.LastButtonClicked is None:
+            if not self.XFound:
+                if (
+                    self.Timeout != 0
+                    and self.Timeout is not None
+                    and self.ReturnValues[0] is None
+                ):       # Special Qt case because returning for no reason so fake timeout
+                    self.ReturnValues = self.TimeoutKey, self.ReturnValues[1]   # fake a timeout
+                elif self.ReturnValues[0] is None:                   # TODO HIGHLY EXPERIMENTAL... added due to tray icon interaction
+                    # print("*** Faking timeout ***")
+                    self.ReturnValues = self.TimeoutKey, self.ReturnValues[1]   # fake a timeout
+            return self.ReturnValues
+
+        else:
             results = BuildResults(self, False, self)
             if not self.LastButtonClickedWasRealtime:
                 self.LastButtonClicked = None
             return results
-        else:
-            if not self.XFound and self.Timeout != 0 and self.Timeout is not None and self.ReturnValues[0] is None:       # Special Qt case because returning for no reason so fake timeout
-                self.ReturnValues = self.TimeoutKey, self.ReturnValues[1]   # fake a timeout
-            elif not self.XFound and self.ReturnValues[0] is None:                   # TODO HIGHLY EXPERIMENTAL... added due to tray icon interaction
-                # print("*** Faking timeout ***")
-                self.ReturnValues = self.TimeoutKey, self.ReturnValues[1]   # fake a timeout
-            return self.ReturnValues
 
     def _ReadNonBlocking(self):
         if self.TKrootDestroyed:
@@ -3596,15 +3602,14 @@ class Window:
             element = None
         # element = _FindElementFromKeyInSubForm(self, key)
         if element is None:
-            if not silent_on_error:
-                print('*** WARNING = FindElement did not find the key. Please check your key\'s spelling ***')
-                PopupError('Keyword error in FindElement Call',
-                           'Bad key = {}'.format(key),
-                           'Your bad line of code may resemble this:',
-                           'window.FindElement("{}")'.format(key))
-                return ErrorElement(key=key)
-            else:
+            if silent_on_error:
                 return False
+            print('*** WARNING = FindElement did not find the key. Please check your key\'s spelling ***')
+            PopupError('Keyword error in FindElement Call',
+                       'Bad key = {}'.format(key),
+                       'Your bad line of code may resemble this:',
+                       'window.FindElement("{}")'.format(key))
+            return ErrorElement(key=key)
         return element
 
     Element =  FindElement          # Shortcut function

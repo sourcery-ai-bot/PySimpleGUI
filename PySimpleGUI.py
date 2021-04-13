@@ -693,9 +693,8 @@ class Element():
         """
         for row in form.Rows:
             for element in row:
-                if element.Type == ELEM_TYPE_BUTTON:
-                    if element.BindReturnKey:
-                        return element
+                if element.Type == ELEM_TYPE_BUTTON and element.BindReturnKey:
+                    return element
                 if element.Type == ELEM_TYPE_COLUMN:
                     rc = self._FindReturnKeyBoundButton(element)
                     if rc is not None:
@@ -755,10 +754,7 @@ class Element():
         """
         # first, get the results table built
         # modify the Results table in the parent FlexForm object
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()  # kick the users out of the mainloop
@@ -771,10 +767,7 @@ class Element():
         """
         # first, get the results table built
         # modify the Results table in the parent FlexForm object
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()  # kick the users out of the mainloop
@@ -783,10 +776,7 @@ class Element():
         """
         Internal callback for when a radio button is selected and enable events was set for radio
         """
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()
@@ -795,10 +785,7 @@ class Element():
         """
         Internal callback for when a checkbnox is selected and enable events was set for checkbox
         """
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()
@@ -809,10 +796,7 @@ class Element():
 
         :param event: Event data passed in by tkinter (not used)
         """
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()
@@ -823,10 +807,7 @@ class Element():
 
         :param event: Event data passed in by tkinter (not used)
         """
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()
@@ -837,10 +818,7 @@ class Element():
 
         :param event: Event data passed in by tkinter (not used)
         """
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()
@@ -1220,7 +1198,7 @@ class Combo(Element):
         self.Widget = self.TKCombo = None  # type: ttk.Combobox
         self.Disabled = disabled
         self.Readonly = readonly
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
 
         super().__init__(ELEM_TYPE_INPUT_COMBO, size=size, auto_size_text=auto_size_text, background_color=bg,
@@ -1362,7 +1340,7 @@ class OptionMenu(Element):
         self.DefaultValue = default_value
         self.Widget = self.TKOptionMenu = None  # type: tk.OptionMenu
         self.Disabled = disabled
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
 
         super().__init__(ELEM_TYPE_INPUT_OPTION_MENU, size=size, auto_size_text=auto_size_text, background_color=bg,
@@ -1487,7 +1465,7 @@ class Listbox(Element):
             self.SelectMode = SELECT_MODE_SINGLE
         else:
             self.SelectMode = DEFAULT_LISTBOX_SELECT_MODE
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
         self.RightClickMenu = right_click_menu
         self.vsb = None  # type: tk.Scrollbar
@@ -1675,11 +1653,11 @@ class Radio(Element):
         self.GroupID = group_id
         self.Value = None
         self.Disabled = disabled
-        self.TextColor = text_color if text_color else theme_text_color()
+        self.TextColor = text_color or theme_text_color()
         # ---- compute color of circle background ---
-        try:          # something in here will fail if a color is not specified in Hex
+        try:      # something in here will fail if a color is not specified in Hex
             text_hsl = _hex_to_hsl(self.TextColor)
-            background_hsl = _hex_to_hsl(background_color if background_color else theme_background_color())
+            background_hsl = _hex_to_hsl(background_color or theme_background_color())
             l_delta = abs(text_hsl[2] - background_hsl[2])/10
             if text_hsl[2] > background_hsl[2]:      # if the text is "lighter" than the background then make background darker
                 bg_rbg = _hsl_to_rgb(background_hsl[0], background_hsl[1], background_hsl[2]-l_delta)
@@ -1687,7 +1665,7 @@ class Radio(Element):
                 bg_rbg = _hsl_to_rgb(background_hsl[0], background_hsl[1],background_hsl[2]+l_delta)
             self.CircleBackgroundColor = RGB(*bg_rbg)
         except:
-            self.CircleBackgroundColor = background_color if background_color else theme_background_color()
+            self.CircleBackgroundColor = background_color or theme_background_color()
         self.ChangeSubmits = change_submits or enable_events
         self.EncodedRadioValue = None
         super().__init__(ELEM_TYPE_INPUT_RADIO, size=size, auto_size_text=auto_size_text, font=font,
@@ -1802,11 +1780,11 @@ class Checkbox(Element):
         self.Value = None
         self.TKCheckbutton = self.Widget = None  # type: tk.Checkbutton
         self.Disabled = disabled
-        self.TextColor = text_color if text_color else theme_text_color()
+        self.TextColor = text_color or theme_text_color()
         # ---- compute color of circle background ---
-        try:        # something in here will fail if a color is not specified in Hex
+        try:    # something in here will fail if a color is not specified in Hex
             text_hsl = _hex_to_hsl(self.TextColor)
-            background_hsl = _hex_to_hsl(background_color if background_color else theme_background_color())
+            background_hsl = _hex_to_hsl(background_color or theme_background_color())
             # print(f'backgroundHSL = {background_hsl}')
             l_delta = abs(text_hsl[2] - background_hsl[2])/10
             if text_hsl[2] > background_hsl[2]:      # if the text is "lighter" than the background then make background darker
@@ -1815,7 +1793,7 @@ class Checkbox(Element):
                 bg_rbg = _hsl_to_rgb(background_hsl[0], background_hsl[1],background_hsl[2]+l_delta)
             self.CheckboxBackgroundColor = RGB(*bg_rbg)
         except:
-            self.CheckboxBackgroundColor = background_color if background_color else theme_background_color()
+            self.CheckboxBackgroundColor = background_color or theme_background_color()
 
         self.ChangeSubmits = change_submits or enable_events
 
@@ -1877,7 +1855,7 @@ class Checkbox(Element):
             # ---- compute color of circle background ---
             # try:        # something in here will fail if a color is not specified in Hex
             text_hsl = _hex_to_hsl(self.TextColor)
-            background_hsl = _hex_to_hsl(self.BackgroundColor if self.BackgroundColor else theme_background_color())
+            background_hsl = _hex_to_hsl(self.BackgroundColor or theme_background_color())
             # print(f'backgroundHSL = {background_hsl}')
             l_delta = abs(text_hsl[2] - background_hsl[2])/10
             if text_hsl[2] > background_hsl[2]:      # if the text is "lighter" than the background then make background darker
@@ -1958,7 +1936,7 @@ class Spin(Element):
         self.ChangeSubmits = change_submits or enable_events
         self.TKSpinBox = self.Widget = None  # type: tk.Spinbox
         self.Disabled = disabled
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
 
         super().__init__(ELEM_TYPE_INPUT_SPIN, size, auto_size_text, font=font, background_color=bg, text_color=fg,
@@ -2010,10 +1988,7 @@ class Spin(Element):
         :param event: passed in from tkinter
         """
         # first, get the results table built
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()  # kick the users out of the mainloop
@@ -2094,7 +2069,7 @@ class Multiline(Element):
 
         self.DefaultText = default_text
         self.EnterSubmits = enter_submits
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         self.Focus = focus
         self.do_not_clear = do_not_clear
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
@@ -2138,25 +2113,25 @@ class Multiline(Element):
 
         if value is not None:
             value = str(value)
-            if background_color_for_value is not None or text_color_for_value is not None:
+            if background_color_for_value is None and text_color_for_value is None:
+                tag = None
+            else:
                 tag = 'Multiline(' + str(text_color_for_value) + ','+ str(background_color_for_value)+')'
                 if  tag not in self.tags:
                     self.tags.add(tag)
-                if background_color_for_value is not None:
-                    self.TKText.tag_configure(tag, background=background_color_for_value)
-                if text_color_for_value is not None:
-                    self.TKText.tag_configure(tag, foreground=text_color_for_value)
-            else:
-                tag = None
+            if background_color_for_value is not None:
+                self.TKText.tag_configure(tag, background=background_color_for_value)
+            if text_color_for_value is not None:
+                self.TKText.tag_configure(tag, foreground=text_color_for_value)
             if self.Disabled:
                 self.TKText.configure(state='normal')
             try:
                 if not append:
                     self.TKText.delete('1.0', tk.END)
-                if tag is not None:
-                    self.TKText.insert(tk.END, value, tag)
-                else:
+                if tag is None:
                     self.TKText.insert(tk.END, value)
+                else:
+                    self.TKText.insert(tk.END, value, tag)
             except:
                 pass
             if self.Disabled:
@@ -2271,7 +2246,7 @@ class Text(Element):
         """
 
         self.DisplayText = str(text)
-        self.TextColor = text_color if text_color else DEFAULT_TEXT_COLOR
+        self.TextColor = text_color or DEFAULT_TEXT_COLOR
         self.Justification = justification
         self.Relief = relief
         self.ClickSubmits = click_submits or enable_events
@@ -2283,8 +2258,19 @@ class Text(Element):
         self.TKRightClickMenu = None
         self.BorderWidth = border_width
 
-        super().__init__(ELEM_TYPE_TEXT, size, auto_size_text, background_color=bg, font=font if font else DEFAULT_FONT,
-                         text_color=self.TextColor, pad=pad, key=key, tooltip=tooltip, visible=visible, metadata=metadata)
+        super().__init__(
+            ELEM_TYPE_TEXT,
+            size,
+            auto_size_text,
+            background_color=bg,
+            font=font or DEFAULT_FONT,
+            text_color=self.TextColor,
+            pad=pad,
+            key=key,
+            tooltip=tooltip,
+            visible=visible,
+            metadata=metadata,
+        )
 
     def Update(self, value=None, background_color=None, text_color=None, font=None, visible=None):
         """
@@ -2386,7 +2372,7 @@ class StatusBar(Element):
         """
 
         self.DisplayText = text
-        self.TextColor = text_color if text_color else DEFAULT_TEXT_COLOR
+        self.TextColor = text_color or DEFAULT_TEXT_COLOR
         self.Justification = justification
         self.Relief = relief
         self.ClickSubmits = click_submits or enable_events
@@ -2658,7 +2644,7 @@ class Output(Element):
         """
 
         self._TKOut = self.Widget = None  # type: TKOutput
-        bg = background_color if background_color else DEFAULT_INPUT_ELEMENTS_COLOR
+        bg = background_color or DEFAULT_INPUT_ELEMENTS_COLOR
         fg = text_color if text_color is not None else DEFAULT_INPUT_TEXT_COLOR
         self.RightClickMenu = right_click_menu
 
@@ -3225,7 +3211,7 @@ class ButtonMenu(Element):
         self.MenuDefinition = menu_def
         self.AutoSizeButton = auto_size_button
         self.ButtonText = button_text
-        self.ButtonColor = button_color if button_color else DEFAULT_BUTTON_COLOR
+        self.ButtonColor = button_color or DEFAULT_BUTTON_COLOR
         self.TextColor = self.ButtonColor[0]
         self.BackgroundColor = self.ButtonColor[1]
         self.BorderWidth = border_width
@@ -3341,11 +3327,11 @@ class ProgressBar(Element):
         self.TKProgressBar = None  # type: TKProgressBar
         self.Cancelled = False
         self.NotRunning = True
-        self.Orientation = orientation if orientation else DEFAULT_METER_ORIENTATION
+        self.Orientation = orientation or DEFAULT_METER_ORIENTATION
         self.BarColor = bar_color
-        self.BarStyle = style if style else DEFAULT_TTK_THEME
-        self.BorderWidth = border_width if border_width else DEFAULT_PROGRESS_BAR_BORDER_WIDTH
-        self.Relief = relief if relief else DEFAULT_PROGRESS_BAR_RELIEF
+        self.BarStyle = style or DEFAULT_TTK_THEME
+        self.BorderWidth = border_width or DEFAULT_PROGRESS_BAR_BORDER_WIDTH
+        self.Relief = relief or DEFAULT_PROGRESS_BAR_RELIEF
         self.BarExpired = False
         super().__init__(ELEM_TYPE_PROGRESS_BAR, size=size, auto_size_text=auto_size_text, key=key, pad=pad,
                          visible=visible, metadata=metadata)
@@ -3511,16 +3497,13 @@ class Image(Element):
             self.TotalAnimatedFrames = 0
             self.AnimatedFrames = []
             for i in range(1000):
-                if type(source) is not bytes:
-                    try:
+                try:
+                    if type(source) is not bytes:
                         self.AnimatedFrames.append(tk.PhotoImage(file=source, format='gif -index %i' % (i)))
-                    except:
-                        break
-                else:
-                    try:
+                    else:
                         self.AnimatedFrames.append(tk.PhotoImage(data=source, format='gif -index %i' % (i)))
-                    except:
-                        break
+                except:
+                    break
                 self.TotalAnimatedFrames += 1
             self.LastFrameTime = time.time()
             self.CurrentFrameNumber = 0
@@ -3529,13 +3512,10 @@ class Image(Element):
         now = time.time()
 
         if time_between_frames:
-            if (now - self.LastFrameTime) * 1000 > time_between_frames:
-                self.LastFrameTime = now
-                self.CurrentFrameNumber = self.CurrentFrameNumber + 1 if self.CurrentFrameNumber + 1 < self.TotalAnimatedFrames else 0
-            else:  # don't reshow the frame again if not time for new frame
+            if (now - self.LastFrameTime) * 1000 <= time_between_frames:  # don't reshow the frame again if not time for new frame
                 return
-        else:
-            self.CurrentFrameNumber = self.CurrentFrameNumber + 1 if self.CurrentFrameNumber + 1 < self.TotalAnimatedFrames else 0
+            self.LastFrameTime = now
+        self.CurrentFrameNumber = self.CurrentFrameNumber + 1 if self.CurrentFrameNumber + 1 < self.TotalAnimatedFrames else 0
         image = self.AnimatedFrames[self.CurrentFrameNumber]
         try:  # needed in case the window was closed with an "X"
             self.tktext_label.configure(image=image, width=image.width(), heigh=image.height())
@@ -4230,8 +4210,7 @@ class Graph(Element):
         :rtype: List[int]
         """
         x, y = self._convert_xy_to_canvas_xy(location[0], location[1])
-        ids = self.TKCanvas.find_overlapping(x,y,x,y)
-        return ids
+        return self.TKCanvas.find_overlapping(x,y,x,y)
 
     def GetBoundingBox(self, figure):
         """
@@ -4517,8 +4496,7 @@ class Frame(Element):
 
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
     def Update(self, value=None, visible=None):
         """
@@ -4755,8 +4733,7 @@ class Tab(Element):
 
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
     def Select(self):
         """
@@ -4939,8 +4916,7 @@ class TabGroup(Element):
 
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
     def FindKeyFromTabName(self, tab_name):
         """
@@ -5043,9 +5019,9 @@ class Slider(Element):
         self.TKScale = self.Widget = None  # type: tk.Scale
         self.Range = (1, 10) if range == (None, None) else range
         self.DefaultValue = self.Range[0] if default_value is None else default_value
-        self.Orientation = orientation if orientation else DEFAULT_SLIDER_ORIENTATION
-        self.BorderWidth = border_width if border_width else DEFAULT_SLIDER_BORDER_WIDTH
-        self.Relief = relief if relief else DEFAULT_SLIDER_RELIEF
+        self.Orientation = orientation or DEFAULT_SLIDER_ORIENTATION
+        self.BorderWidth = border_width or DEFAULT_SLIDER_BORDER_WIDTH
+        self.Relief = relief or DEFAULT_SLIDER_RELIEF
         self.Resolution = 1 if resolution is None else resolution
         self.ChangeSubmits = change_submits or enable_events
         self.Disabled = disabled
@@ -5100,10 +5076,7 @@ class Slider(Element):
         :param event: (event) the event data provided by tkinter. Unknown format. Not used.
         """
 
-        if self.Key is not None:
-            self.ParentForm.LastButtonClicked = self.Key
-        else:
-            self.ParentForm.LastButtonClicked = ''
+        self.ParentForm.LastButtonClicked = self.Key if self.Key is not None else ''
         self.ParentForm.FormRemainedOpen = True
         if self.ParentForm.CurrentlyRunningMainloop:
             self.ParentForm.TKroot.quit()  # kick the users out of the mainloop
@@ -5396,8 +5369,7 @@ class Column(Element):
 
         (row_num, col_num) = location
         row = self.Rows[row_num]
-        element = row[col_num]
-        return element
+        return row[col_num]
 
     def Update(self, visible=None):
         """
@@ -5668,7 +5640,7 @@ class TKCalendar(ttk.Frame):
         item = widget.identify_row(y)
         column = widget.identify_column(x)
 
-        if not column or not item in self._items:
+        if not column or item not in self._items:
             # clicked in the weekdays row or just outside the columns
             return
 
@@ -5824,9 +5796,8 @@ class Menu(Element):
                     baritem.config(font=self.Font)
                 pos = menu_entry[0].find('&')
                 # print(pos)
-                if pos != -1:
-                    if pos == 0 or menu_entry[0][pos - 1] != "\\":
-                        menu_entry[0] = menu_entry[0][:pos] + menu_entry[0][pos + 1:]
+                if pos != -1 and (pos == 0 or menu_entry[0][pos - 1] != "\\"):
+                    menu_entry[0] = menu_entry[0][:pos] + menu_entry[0][pos + 1:]
                 if menu_entry[0][0] == MENU_DISABLED_CHARACTER:
                     menubar.add_cascade(label=menu_entry[0][len(MENU_DISABLED_CHARACTER):], menu=baritem, underline=pos)
                     menubar.entryconfig(menu_entry[0][len(MENU_DISABLED_CHARACTER):], state='disabled')

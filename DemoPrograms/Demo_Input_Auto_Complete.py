@@ -39,7 +39,7 @@ def main():
 
     sel_item = -1
     fwindow = list_elem = values2 = None
-    while True:             # Event Loop
+    while True:         # Event Loop
         event, values = window.read(timeout=500)
 
         if event in (sg.WIN_CLOSED, 'Exit'):
@@ -60,11 +60,11 @@ def main():
                 sg.popup('Chose', values['_COMBO_'])
 
             if event.startswith('Down') or event.startswith('special 16777237'):
-                sel_item = sel_item + (sel_item < len(prediction_list))
+                sel_item += sel_item < len(prediction_list)
                 list_elem.update(set_to_index=sel_item)
 
             elif event.startswith('Up') or event.startswith('special 16777235'):
-                sel_item = sel_item - (sel_item > 0)
+                sel_item -= sel_item > 0
                 list_elem.update(set_to_index=sel_item)
 
             if event == '\r' or event.startswith('special 16777220'):

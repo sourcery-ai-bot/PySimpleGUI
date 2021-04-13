@@ -73,10 +73,13 @@ def main():
                          for proc in procs]
             sorted_by_cpu_procs = sorted(
                 all_procs, key=operator.itemgetter(1), reverse=False)
-            display_list = []
-            for process in sorted_by_cpu_procs:
-                display_list.append('{:5d} {:5.2f} {}\n'.format(
-                    process[2], process[0]/10, process[1]))
+            display_list = [
+                '{:5d} {:5.2f} {}\n'.format(
+                    process[2], process[0] / 10, process[1]
+                )
+                for process in sorted_by_cpu_procs
+            ]
+
             window['_processes_'].update(display_list)
             print(display_list)
         elif event == 'Kill':
@@ -96,17 +99,22 @@ def main():
                          for proc in procs]
             sorted_by_cpu_procs = sorted(
                 all_procs, key=operator.itemgetter(0), reverse=True)
-            display_list = []
-            for process in sorted_by_cpu_procs:
-                display_list.append('{:5d} {:5.2f} {}\n'.format(
-                    process[2], process[0]/10, process[1]))
+            display_list = [
+                '{:5d} {:5.2f} {}\n'.format(
+                    process[2], process[0] / 10, process[1]
+                )
+                for process in sorted_by_cpu_procs
+            ]
+
             window['_processes_'].update(display_list)
-        else:                   # was a typed character
+        else:           # was a typed character
             if display_list is not None:
-                new_output = []
-                for line in display_list:
-                    if values['_filter_'] in line.lower():
-                        new_output.append(line)
+                new_output = [
+                    line
+                    for line in display_list
+                    if values['_filter_'] in line.lower()
+                ]
+
                 window['_processes_'].update(new_output)
     window.close()
 

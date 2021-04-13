@@ -66,9 +66,9 @@ while True:  # Event Loop
             num_submissions = int(values['-LIMIT-'])
             for num, submission in enumerate(submissions):
                 opened = False
-                text = ''.join([t for t in submission.selftext if ord(t) in range(65536)])
+                text = ''.join(t for t in submission.selftext if ord(t) in range(65536))
                 window['-PROG-'].update_bar(100 * (num + 1) // num_submissions)
-                title = ''.join([t for t in submission.title if ord(t) in range(65536)])
+                title = ''.join(t for t in submission.title if ord(t) in range(65536))
                 window['-NUM POSTS-'].update(num)
                 window.refresh()
                 if search_string in text:
@@ -84,7 +84,7 @@ while True:  # Event Loop
                     for comment in comments:
                         if search_string in comment.body:
                             window['-MLINE-'].update(str(title) + '\n', append=True, autoscroll=True)
-                            comment = ''.join([t for t in comment.body if ord(t) in range(65536)])
+                            comment = ''.join(t for t in comment.body if ord(t) in range(65536))
                             if values['-BROWSER-']:
                                 if not opened:
                                     open_new_tab(submission.url)
